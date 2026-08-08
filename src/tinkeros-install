@@ -1,0 +1,49 @@
+#!/bin/bash
+set -u
+if [ "$(id -u)" -ne 0 ]; then echo "Run as root"; exit 1; fi
+ROOT_FS=/cdrom/casper/filesystem.squashfs
+if [ ! -f "$ROOT_FS" ]; then echo "Not running from live medium"; exit 1; fi
+echo "=== Tinker OS Installer ==="
+lsblk -d -o NAME,SIZE,MODEL | grep -v loop
+target=""
+if [ -n "${1:-}" ]; then target="$1"; else echo -n "Target disk (e.g. /dev/sda): "; read -r target; fi
+if [ ! -b "$target" ]; then echo "Not a block device: $target"; exit 1; fi
+if ! lsblk -npo NAME "$target" | tail -n +2 | grep -q .; then
+  parted -s "$target" mklabel gpt mkpart primary ext4 1MiB 100% >/dev/null 2>&1
+  partprobe "$target" || true; sleep 3
+fi
+part=$(lsblk -npo NAME "$target" | tail -n +2 | head -n 1 | sed 's/[^/a-zA-Z0-9]//g')
+echo "Installing to: $part"
+mkfs.ext4 -q -F -L TINKEROS "$part" || { echo "Format failed"; exit 1; }
+mkdir -p /mnt/inst; mount "$part" /mnt/inst
+unsquashfs -f -d /mnt/inst "$ROOT_FS" >/dev/null 2>&1
+chown -R 1000:1000 /mnt/inst/home/tinkeros/ 2>/dev/null
+rm -rf /mnt/inst/home/tinkeros/.cache
+mkdir -p /mnt/inst/dev /mnt/inst/proc /mnt/inst/sys /mnt/inst/run
+mount --bind /dev /mnt/inst/dev; mount --bind /proc /mnt/inst/proc
+mount --bind /sys /mnt/inst/sys; mount --bind /run /mnt/inst/run
+UUID=$(blkid -s UUID -o value "$part")
+cat > /mnt/inst/etc/fstab <<EOF
+UUID=$UUID  /  ext4  errors=remount-ro  0  1
+EOF
+chroot /mnt/inst /bin/bash -c "
+  export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  apt-get remove -y casper 2>/dev/null
+  update-initramfs -c -k 6.8.0-137-generic >/dev/null 2>&1
+  grub-install --target=i386-pc --force '$target' >/dev/null 2>&1
+  mkdir -p /boot/grub
+  cat > /boot/grub/grub.cfg <<GRUB
+set timeout=3
+set default=0
+serial --unit=0 --speed=115200
+terminal_input serial console
+terminal_output serial console
+menuentry 'Tinker OS' {
+  linux /boot/vmlinuz-6.8.0-137-generic root=UUID=$UUID console=tty0 console=ttyS0,115200n8 quiet
+  initrd /boot/initrd.img-6.8.0-137-generic
+}
+GRUB
+"
+umount -R /mnt/inst/proc /mnt/inst/sys /mnt/inst/dev /mnt/inst/run 2>/dev/null
+umount /mnt/inst
+echo "=== Done! Tinker OS installed on $target ==="

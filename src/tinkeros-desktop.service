@@ -1,0 +1,13 @@
+[Unit]
+Description=Tinker OS Desktop
+After=network.target tinkeros-server.service
+Requires=tinkeros-server.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/tinkeros-desktop-start
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical.target

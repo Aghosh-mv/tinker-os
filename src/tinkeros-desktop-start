@@ -1,0 +1,37 @@
+#!/bin/bash
+export HOME=/home/tinkeros
+export USER=tinkeros
+export XAUTHORITY=/home/tinkeros/.Xauthority
+
+chown -R tinkeros:tinkeros /home/tinkeros/ 2>/dev/null
+rm -rf /home/tinkeros/.cache
+mkdir -p /home/tinkeros/.cache
+chown -R tinkeros:tinkeros /home/tinkeros/
+
+/usr/bin/Xorg :0 -nolisten tcp -sharevts &
+XPID=$!
+
+for i in $(seq 1 30); do
+  sleep 1
+  [ -S /tmp/.X11-unix/X0 ] && break
+done
+
+sleep 2
+
+# Window manager (for Alt+Tab, minimize, maximize, close)
+su tinkeros -c "DISPLAY=:0 XAUTHORITY=/home/tinkeros/.Xauthority xfwm4 --replace &" &
+
+# Panel (taskbar, system tray, clock)
+su tinkeros -c "DISPLAY=:0 XAUTHORITY=/home/tinkeros/.Xauthority xfce4-panel &" &
+
+# Desktop (right-click menu, icons)
+su tinkeros -c "DISPLAY=:0 XAUTHORITY=/home/tinkeros/.Xauthority xfdesktop &" &
+
+# Chrome - NORMAL mode, web desktop as homepage
+sleep 3
+su tinkeros -c "DISPLAY=:0 XAUTHORITY=/home/tinkeros/.Xauthority google-chrome --no-sandbox --no-first-run --no-default-browser-check --disable-translate --disable-session-crashed-bubble --disable-infobars http://localhost:4040 &" &
+
+# PulseAudio
+su tinkeros -c "pulseaudio --start &" &
+
+wait $XPID

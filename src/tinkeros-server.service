@@ -1,0 +1,12 @@
+[Unit]
+Description=Tinker OS system server
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/tinkeros
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

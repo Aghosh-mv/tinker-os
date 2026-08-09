@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tinker OS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Desktop Background -->
+    <div class="desktop-background" id="desktopBg"></div>
+
+    <!-- Lock Screen -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-content">
+            <div class="lock-time" id="lockTime">00:00</div>
+            <div class="lock-date" id="lockDate">Monday, January 1</div>
+            <input type="password" class="lock-input" id="lockInput" placeholder="Enter password to unlock" autocomplete="off">
+            <div class="lock-error" id="lockError">Incorrect password</div>
+        </div>
+    </div>
+
+    <!-- Menubar -->
+    <div class="menubar" id="menubar">
+        <div class="menu-logo" id="menuLogo">TinkerOS</div>
+        <div class="menu-items">
+            <div class="menu-item" onclick="openApp('finder')">Files</div>
+            <div class="menu-item" onclick="openApp('browser')">Chrome</div>
+            <div class="menu-item" onclick="openApp('terminal')">Terminal</div>
+            <div class="menu-item">Settings</div>
+        </div>
+        <div class="menu-right">
+            <div class="menu-icon" onclick="toggleSearch()">🔍</div>
+            <div class="menu-icon" onclick="toggleWifi()">📶</div>
+            <div class="menu-icon" onclick="togglePower()">⚙</div>
+        </div>
+    </div>
+
+    <!-- Desktop Icons -->
+    <div class="desktop-icons" id="desktopIcons">
+        <div class="desktop-icon" onclick="openApp('finder')">
+            <div class="desktop-icon-img">📁</div>
+            <div class="desktop-icon-label">Home</div>
+        </div>
+        <div class="desktop-icon" onclick="openApp('browser')">
+            <div class="desktop-icon-img">🌐</div>
+            <div class="desktop-icon-label">Chrome</div>
+        </div>
+        <div class="desktop-icon" onclick="openApp('terminal')">
+            <div class="desktop-icon-img">💻</div>
+            <div class="desktop-icon-label">Terminal</div>
+        </div>
+    </div>
+
+    <!-- Glassmorphism Widgets -->
+    <div class="widgets">
+        <div class="widget clock-widget" id="clockWidget">
+            <div class="widget-time" id="widgetTime">00:00</div>
+            <div class="widget-date" id="widgetDate">Monday, Jan 1</div>
+            <div class="widget-weather">☁️ 22°C</div>
+        </div>
+        <div class="widget music-widget">
+            <div class="widget-title">Now Playing</div>
+            <div class="widget-text">Tinker OS Theme</div>
+            <div class="widget-bar"><div class="widget-progress"></div></div>
+        </div>
+    </div>
+
+    <!-- Spotlight Search -->
+    <div class="spotlight" id="spotlight">
+        <div class="spotlight-input-container">
+            <input type="text" class="spotlight-input" id="spotlightInput" placeholder="Search..." autocomplete="off">
+        </div>
+        <div class="spotlight-results" id="spotlightResults"></div>
+        <div class="spotlight-footer">Press <kbd>Esc</kbd> to close</div>
+    </div>
+
+    <!-- App Grid -->
+    <div class="app-grid" id="appGrid">
+        <div class="app-grid-close" onclick="closeAppGrid()">×</div>
+        <div class="app-grid-title">Tinker OS Apps</div>
+        <div class="app-grid-container" id="appGridContainer">
+            <div class="app-grid-item" onclick="openApp('finder')">
+                <div class="app-grid-img">📁</div>
+                <div class="app-grid-label">Files</div>
+            </div>
+            <div class="app-grid-item" onclick="openApp('browser')">
+                <div class="app-grid-img">🌐</div>
+                <div class="app-grid-label">Chrome</div>
+            </div>
+            <div class="app-grid-item" onclick="openApp('terminal')">
+                <div class="app-grid-img">💻</div>
+                <div class="app-grid-label">Terminal</div>
+            </div>
+            <div class="app-grid-item" onclick="openApp('settings')">
+                <div class="app-grid-img">⚙️</div>
+                <div class="app-grid-label">Settings</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar" id="taskbar">
+        <div class="taskbar-left">
+            <div class="taskbar-logo" onclick="openAppGrid()">TinkerOS</div>
+        </div>
+        <div class="taskbar-center" id="taskbarCenter">
+            <div class="taskbar-app active" id="appFinder">📁 Files</div>
+        </div>
+        <div class="taskbar-right">
+            <div class="taskbar-icon" onclick="toggleWifi()">📶</div>
+            <div class="taskbar-icon" onclick="toggleAudio()">🔊</div>
+            <div class="taskbar-icon" onclick="openApp('settings')">⚙️</div>
+            <div class="taskbar-time" id="taskbarTime">00:00</div>
+        </div>
+    </div>
+
+    <!-- Window Manager (dynamic) -->
+    <div class="window-manager" id="windowManager"></div>
+
+    <!-- App Windows Container -->
+    <div class="windows" id="windows"></div>
+
+    <script src="apps.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

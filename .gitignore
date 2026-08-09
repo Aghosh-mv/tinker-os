@@ -1,2 +1,3 @@
 *.sock
-*.log
+qemu-console.log
+qemu-iso-console.log
